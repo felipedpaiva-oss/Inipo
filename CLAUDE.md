@@ -15,6 +15,7 @@ texto) um lançamento no chat, e o agente adiciona uma linha em `planilha/lancam
 
 1. Extraia os 5 campos acima da mensagem. Se um campo não ficar claro (ex: data ambígua,
    valor sem indicação clara), pergunte antes de adicionar — não adivinhe valores financeiros.
+   Exceção: se o usuário não informar o N° du justificatif, preencha com "0" sem perguntar.
 2. Rode:
    ```bash
    python3 scripts/add_lancamento.py "DATA" "DESIGNATION" "N_JUSTIFICATIF" "MONTANT" "CLASSE"
