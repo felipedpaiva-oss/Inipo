@@ -26,3 +26,11 @@ texto) um lançamento no chat, e o agente adiciona uma linha em `planilha/lancam
 Não edite `planilha/lancamentos.xlsx` diretamente com outras ferramentas de spreadsheet — use
 sempre `scripts/add_lancamento.py`, que mantém formatação e localiza a próxima linha vazia
 corretamente.
+
+## Grafias padronizadas da Classe
+
+Antes de adicionar uma linha, verifique se a Classe informada já existe na planilha com outra
+grafia (ex: "picnic" vs "pique nique") e use a grafia já em uso, em vez de introduzir uma nova
+variação. Grafias confirmadas até agora:
+
+- "pique nique" (não "picnic")
