@@ -34,3 +34,4 @@ grafia (ex: "picnic" vs "pique nique") e use a grafia já em uso, em vez de intr
 variação. Grafias confirmadas até agora:
 
 - "FRAIS PIQUE-NIQUES" (não "picnic" nem "pique nique", renomeado em 11/09/2026)
+- "FRAIS, TAXES DE SEJOUR, REPAS Accompagnateur" (não "repas accompagnateur", renomeado em 11/09/2026)
