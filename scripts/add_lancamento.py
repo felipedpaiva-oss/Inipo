@@ -1,4 +1,4 @@
-"""Adiciona uma linha de lançamento à planilha planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx.
+"""Adiciona uma linha de lançamento à planilha ativa (ver planilha/.current).
 
 Uso:
     python3 scripts/add_lancamento.py "DATA" "DESIGNATION" "N_JUSTIFICATIF" "MONTANT" "CLASSE"
@@ -8,6 +8,9 @@ Exemplo:
 
 Os 5 argumentos devem seguir sempre esta ordem, que corresponde às colunas fixas da planilha:
 DATES (JJ/MM/AAAA) | DESIGNATION | N° du justificatif | MONTANT EN EUROS | Classe
+
+A planilha alvo é a apontada por planilha/.current (criado por
+scripts/nova_planilha.py). Se não existir, rode nova_planilha.py primeiro.
 """
 
 import sys
@@ -16,7 +19,30 @@ from pathlib import Path
 import openpyxl
 from openpyxl.styles import Font, Border, Side
 
-XLSX_PATH = Path(__file__).resolve().parent.parent / "planilha" / "Notes de frais Pouilles du Sud 06-09-26.xlsx"
+PLANILHA_DIR = Path(__file__).resolve().parent.parent / "planilha"
+CURRENT_POINTER = PLANILHA_DIR / ".current"
+
+HEADER_MARKER = "DATES (JJ/MM/AAAA)"
+
+
+def get_xlsx_path() -> Path:
+    if not CURRENT_POINTER.exists():
+        sys.exit(
+            "Nenhuma planilha ativa (planilha/.current não existe). "
+            'Rode primeiro: python3 scripts/nova_planilha.py "nome da viagem"'
+        )
+    filename = CURRENT_POINTER.read_text(encoding="utf-8").strip()
+    path = PLANILHA_DIR / filename
+    if not path.exists():
+        sys.exit(f"Planilha ativa aponta para {path}, mas o arquivo não existe.")
+    return path
+
+
+def find_header_row(ws) -> int:
+    for row in ws.iter_rows(min_row=1, max_row=min(ws.max_row, 5)):
+        if row[0].value == HEADER_MARKER:
+            return row[0].row
+    sys.exit(f"Não encontrei a linha de cabeçalho ({HEADER_MARKER!r}) na planilha.")
 
 
 def main() -> None:
@@ -32,11 +58,14 @@ def main() -> None:
     except ValueError:
         sys.exit(f"MONTANT inválido: {montant_raw!r} (use um número, ex: 45.50)")
 
-    wb = openpyxl.load_workbook(XLSX_PATH)
+    xlsx_path = get_xlsx_path()
+    wb = openpyxl.load_workbook(xlsx_path)
     ws = wb["Dépenses"]
 
-    last_used_row = 2
-    for row in ws.iter_rows(min_row=3, max_row=ws.max_row):
+    header_row = find_header_row(ws)
+
+    last_used_row = header_row
+    for row in ws.iter_rows(min_row=header_row + 1, max_row=ws.max_row):
         if row[0].value not in (None, ""):
             last_used_row = row[0].row
     next_row = last_used_row + 1
@@ -53,8 +82,8 @@ def main() -> None:
         if col == 4:
             cell.number_format = "#,##0.00"
 
-    wb.save(XLSX_PATH)
-    print(f"Linha {next_row} adicionada em {XLSX_PATH.relative_to(XLSX_PATH.parent.parent)}")
+    wb.save(xlsx_path)
+    print(f"Linha {next_row} adicionada em {xlsx_path.relative_to(xlsx_path.parent.parent)}")
 
 
 if __name__ == "__main__":
