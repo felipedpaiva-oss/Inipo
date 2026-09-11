@@ -1,7 +1,7 @@
 # Inipo — agente de lançamentos
 
 Este repositório existe para um único fluxo: o usuário digita ou dita (voz já transcrita em
-texto) um lançamento no chat, e o agente adiciona uma linha em `planilha/lancamentos.xlsx`.
+texto) um lançamento no chat, e o agente adiciona uma linha em `planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx`.
 
 ## Convenção dos campos (ordem fixa, não alterar)
 
@@ -23,7 +23,7 @@ texto) um lançamento no chat, e o agente adiciona uma linha em `planilha/lancam
 3. Confirme ao usuário a linha adicionada (todos os 5 campos) antes de commitar.
 4. Faça commit e push da planilha atualizada para o branch de trabalho.
 
-Não edite `planilha/lancamentos.xlsx` diretamente com outras ferramentas de spreadsheet — use
+Não edite `planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx` diretamente com outras ferramentas de spreadsheet — use
 sempre `scripts/add_lancamento.py`, que mantém formatação e localiza a próxima linha vazia
 corretamente.
 
@@ -41,7 +41,7 @@ variação. Grafias confirmadas até agora:
 
 ## Estrutura da planilha (a partir de 12/09/2026)
 
-`planilha/lancamentos.xlsx` tem 1 aba:
+`planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx` tem 1 aba:
 
 - **Dépenses** (antes "Lançamentos"): linha 1 = título do relatório, linha 2 = cabeçalho,
   linhas seguintes = lançamentos agrupados por classe com subtotais ("Sous-total"), seguidos

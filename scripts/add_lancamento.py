@@ -1,4 +1,4 @@
-"""Adiciona uma linha de lançamento à planilha planilha/lancamentos.xlsx.
+"""Adiciona uma linha de lançamento à planilha planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx.
 
 Uso:
     python3 scripts/add_lancamento.py "DATA" "DESIGNATION" "N_JUSTIFICATIF" "MONTANT" "CLASSE"
@@ -16,7 +16,7 @@ from pathlib import Path
 import openpyxl
 from openpyxl.styles import Font, Border, Side
 
-XLSX_PATH = Path(__file__).resolve().parent.parent / "planilha" / "lancamentos.xlsx"
+XLSX_PATH = Path(__file__).resolve().parent.parent / "planilha" / "Notes de frais Pouilles du Sud 06-09-26.xlsx"
 
 
 def main() -> None:

@@ -9,7 +9,8 @@ Agente para registrar lançamentos financeiros por chat (texto ou voz já transc
 
    > lançamento: 06/09/2026, achat fournitures de bureau, comprovante F2026-0002, 32,90 euros, classe 2
 
-3. O agente extrai os 5 campos, na ordem fixa abaixo, e adiciona uma linha em `planilha/lancamentos.xlsx`:
+3. O agente extrai os 5 campos, na ordem fixa abaixo, e adiciona uma linha em
+   `planilha/Notes de frais Pouilles du Sud 06-09-26.xlsx`:
 
    | Coluna | Descrição |
    |---|---|
@@ -20,8 +21,6 @@ Agente para registrar lançamentos financeiros por chat (texto ou voz já transc
    | Classe | Classe/categoria contábil |
 
 4. As alterações são commitadas e enviadas para o branch de trabalho.
-
-Veja a aba **Legenda** dentro da planilha para um exemplo de linha preenchida.
 
 ## Adicionar uma linha manualmente
 
