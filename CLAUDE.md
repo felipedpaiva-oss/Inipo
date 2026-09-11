@@ -33,4 +33,4 @@ Antes de adicionar uma linha, verifique se a Classe informada já existe na plan
 grafia (ex: "picnic" vs "pique nique") e use a grafia já em uso, em vez de introduzir uma nova
 variação. Grafias confirmadas até agora:
 
-- "pique nique" (não "picnic")
+- "FRAIS PIQUE-NIQUES" (não "picnic" nem "pique nique", renomeado em 11/09/2026)
