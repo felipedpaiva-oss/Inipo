@@ -38,3 +38,19 @@ variação. Grafias confirmadas até agora:
 - "FRAIS VISITES" (não "visitas", renomeado em 11/09/2026)
 - "FRAIS TRANSPORT DU GROUPE (tickets de bus,…)" (não "transport", renomeado em 11/09/2026)
 - "NOTE DE FRAIS HORS SEJOUR" (não "hors séjour", renomeado em 11/09/2026)
+
+## Estrutura da planilha (a partir de 12/09/2026)
+
+`planilha/lancamentos.xlsx` tem 2 abas:
+
+- **Dépenses** (antes "Lançamentos"): linha 1 = título do relatório, linha 2 = cabeçalho,
+  linhas seguintes = lançamentos agrupados por classe com subtotais ("Sous-total"), seguidos
+  de "TOTAL GÉNÉRAL", "Avance reçue" (adiantamento) e "MONTANT À REMBOURSER". Novos
+  lançamentos adicionados por `scripts/add_lancamento.py` entram sempre depois da última linha
+  usada (ou seja, no fim de tudo, sem respeitar os grupos por classe).
+- **Légende** (antes "Legenda"): explicação das colunas e exemplo de linha, em francês.
+
+Todo texto estrutural da planilha (nomes de aba, cabeçalhos, "Sous-total", "TOTAL GÉNÉRAL",
+"Avance reçue", "MONTANT À REMBOURSER", conteúdo da Légende) deve ficar em francês. O
+conteúdo dos lançamentos em si (DESIGNATION) NÃO deve ser traduzido — é o texto literal do
+comprovante/descrição que o usuário informou.

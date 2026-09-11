@@ -33,11 +33,13 @@ def main() -> None:
         sys.exit(f"MONTANT inválido: {montant_raw!r} (use um número, ex: 45.50)")
 
     wb = openpyxl.load_workbook(XLSX_PATH)
-    ws = wb["Lançamentos"]
+    ws = wb["Dépenses"]
 
-    next_row = 2
-    while ws.cell(row=next_row, column=1).value not in (None, ""):
-        next_row += 1
+    last_used_row = 2
+    for row in ws.iter_rows(min_row=3, max_row=ws.max_row):
+        if row[0].value not in (None, ""):
+            last_used_row = row[0].row
+    next_row = last_used_row + 1
     values = [data, designation, justificatif, montant, classe]
 
     thin = Side(style="thin", color="B7B7B7")
