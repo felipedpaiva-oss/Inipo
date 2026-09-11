@@ -37,3 +37,4 @@ variação. Grafias confirmadas até agora:
 - "FRAIS, TAXES DE SEJOUR, REPAS Accompagnateur" (não "repas accompagnateur", renomeado em 11/09/2026)
 - "FRAIS VISITES" (não "visitas", renomeado em 11/09/2026)
 - "FRAIS TRANSPORT DU GROUPE (tickets de bus,…)" (não "transport", renomeado em 11/09/2026)
+- "NOTE DE FRAIS HORS SEJOUR" (não "hors séjour", renomeado em 11/09/2026)
