@@ -34,12 +34,10 @@ planilha nova manualmente com outras ferramentas.
 1. Extraia os 5 campos da mensagem. Se um campo não ficar claro (ex: data ambígua, valor sem
    indicação clara), pergunte antes de adicionar — não adivinhe valores financeiros. Exceção:
    se o usuário não informar o N° du justificatif, preencha com "0" sem perguntar.
-2. Antes de adicionar, verifique se a Classe informada corresponde a uma classe oficial já
-   definida — a fonte da verdade das grafias oficiais é a última planilha **finalizada** (a de
-   envio, gerada por `finalizar_planilha.py`; ver "Histórico de grafias de Classe já usadas"),
-   não a planilha de lançamento em andamento nem o texto cru que o usuário digitou. Se a classe
-   citada corresponder a uma classe oficial (mesmo com grafia/maiúsculas diferentes), use a
-   grafia oficial. Se for realmente uma classe nova, pergunte antes de criar.
+2. Antes de adicionar, compare a Classe informada com a lista fixa em "Classes oficiais"
+   abaixo. Se corresponder a uma delas (mesmo com grafia/maiúsculas diferentes do que o usuário
+   digitou), use a grafia oficial da lista. Se for realmente uma classe nova (não parece com
+   nenhuma da lista), pergunte antes de criar.
 3. Rode:
    ```bash
    python3 scripts/add_lancamento.py "DATA" "DESIGNATION" "N_JUSTIFICATIF" "MONTANT" "CLASSE"
@@ -78,10 +76,14 @@ Todo texto estrutural da planilha (cabeçalhos, "Sous-total", "TOTAL GÉNÉRAL",
 lançamentos em si (DESIGNATION) NÃO deve ser traduzido — é o texto literal do
 comprovante/descrição que o usuário informou.
 
-## Histórico de grafias de Classe já usadas
+## Classes oficiais
 
-- Viagem "Notes de frais Pouilles du Sud 06-09-26": "FRAIS PIQUE-NIQUES", "FRAIS, TAXES DE
-  SEJOUR, REPAS Accompagnateur", "FRAIS VISITES", "FRAIS TRANSPORT DU GROUPE (tickets de
-  bus,…)", "NOTE DE FRAIS HORS SEJOUR". Essas grafias foram definidas pelo usuário para
-  aquela viagem especificamente — não presuma que a próxima viagem usa as mesmas classes;
-  pergunte se não estiver claro.
+Estas são as classes oficiais, fixas, valem para todas as viagens (definidas a partir da
+planilha finalizada "Notes de frais Pouilles du Sud 06-09-26" e não mudam sozinhas — só o
+usuário pode alterar essa lista):
+
+- FRAIS PIQUE-NIQUES
+- FRAIS, TAXES DE SEJOUR, REPAS Accompagnateur
+- FRAIS VISITES
+- FRAIS TRANSPORT DU GROUPE (tickets de bus,…)
+- NOTE DE FRAIS HORS SEJOUR
