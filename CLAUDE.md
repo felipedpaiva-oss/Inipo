@@ -34,9 +34,12 @@ planilha nova manualmente com outras ferramentas.
 1. Extraia os 5 campos da mensagem. Se um campo não ficar claro (ex: data ambígua, valor sem
    indicação clara), pergunte antes de adicionar — não adivinhe valores financeiros. Exceção:
    se o usuário não informar o N° du justificatif, preencha com "0" sem perguntar.
-2. Antes de adicionar, verifique se a Classe informada já existe na planilha ativa com outra
-   grafia (ex: "picnic" vs "pique nique") e use a grafia já em uso, em vez de introduzir uma
-   nova variação — se houver dúvida, pergunte.
+2. Antes de adicionar, verifique se a Classe informada corresponde a uma classe oficial já
+   definida — a fonte da verdade das grafias oficiais é a última planilha **finalizada** (a de
+   envio, gerada por `finalizar_planilha.py`; ver "Histórico de grafias de Classe já usadas"),
+   não a planilha de lançamento em andamento nem o texto cru que o usuário digitou. Se a classe
+   citada corresponder a uma classe oficial (mesmo com grafia/maiúsculas diferentes), use a
+   grafia oficial. Se for realmente uma classe nova, pergunte antes de criar.
 3. Rode:
    ```bash
    python3 scripts/add_lancamento.py "DATA" "DESIGNATION" "N_JUSTIFICATIF" "MONTANT" "CLASSE"
