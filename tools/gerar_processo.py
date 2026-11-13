@@ -146,6 +146,16 @@ def pagelink(pid):
 FONTE_META = ("Fonte: Meta for Developers — WhatsApp Business Platform, &quot;Customer service windows&quot; "
               "e Messenger/Instagram Platform, &quot;Human Agent tag&quot;.")
 
+CRITERIOS = ("<b>Critérios de qualificação</b> (o agente identifica durante a conversa)<br>"
+             "• Tipo: obra nova, reforma ou casa pronta<br>"
+             "• Bairro / cidade<br>"
+             "• Ambientes<br>"
+             "• Soluções desejadas<br>"
+             "• Prioridade: conforto, segurança, praticidade ou entretenimento<br>"
+             "• Estágio da obra e prazo<br>"
+             "• Faixa de investimento (quando apropriado)<br>"
+             "• Responsáveis pela decisão")
+
 # ================================================================ PÁGINA 1
 def pagina_mapa():
     p = Page("p1", "1. Fontes → Canais → Atendentes", 1900, 1150)
@@ -239,7 +249,7 @@ def pagina_horario():
     ci = p.node("agente", "Regras de inatividade<br><i>(pág. 4)</i>", task("agente", call=True), 185, 250, 170, 70,
                 link=pagelink("p4"))
     gq = p.node("agente", "Lead<br>qualificado?", gw("x", "above"), 500, 80, 50, 50)
-    ts = p.node("agente", "Sinalizar o lead para avaliação humana", task("agente", "send"), 450, 260, 150, 70)
+    ts = p.node("agente", "Sinalizar o lead para avaliação humana <i>(o agente segue a conversa)</i>", task("agente", "send"), 450, 255, 150, 80)
     to = p.node("agente", "Personalizar a proposta e oferecer as 3 opções", task("agente", "service"), 610, 65, 180, 80)
     go = p.node("agente", "Opção<br>escolhida", gw("x", "above"), 860, 80, 50, 50)
     tv = p.node("agente", "1) Agendar visita ao showroom", task("agente", "service"), 990, 10, 180, 60)
@@ -252,6 +262,7 @@ def pagina_horario():
     t30 = p.node("agente", "30 min sem<br>humano assumir", ev("catching", "timer", "below"), 1580, 180, 40, 40)
     tm = p.node("agente", "Enviar ao lead: \"ainda estamos localizando um atendente; fico à disposição para dúvidas\" "
                           "+ <b>2ª notificação ao humano</b>", task("agente", "send"), 1670, 155, 230, 90)
+    hw = p.node("agente", "Aguarda o humano<br>(sem novos lembretes)", ev("catching", "message", "right"), 1765, 300, 40, 40)
 
     # CRM
     ep = p.node("crm", "Funil: Perdidos<br>por inatividade", ev("end", "terminate", "right"), 250, 50, 40, 40)
@@ -263,10 +274,10 @@ def pagina_horario():
     en = p.node("humano", "Não: o agente<br>conduz", ev("end", "general", "right"), 310, 280, 30, 30)
     ha = p.node("humano", "Assumir a conversa (o agente pausa)", task("humano", "user"), 420, 180, 170, 70)
     eh = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 485, 275, 40, 40)
-    hv = p.node("humano", "Avaliar o lead<br><i>(critérios a definir)</i>", task("humano", "user"), 450, 30, 150, 70)
+    hv = p.node("humano", "Avaliar o lead<br><i>(critérios: ver nota)</i>", task("humano", "user"), 450, 30, 150, 70)
     gd = p.node("humano", "Decisão", gw("x", "above"), 650, 40, 50, 50)
     h3 = p.node("humano", "Assumir o chat", task("humano", "user"), 1420, 40, 150, 70)
-    e3 = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 1640, 55, 40, 40)
+    e3 = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 1475, 160, 40, 40)
 
     # Fluxos
     p.edge(s, gp, exit=(0.5, 1), entry=(0.5, 0))
@@ -294,11 +305,10 @@ def pagina_horario():
     p.edge(tn, ge, exit=(1, 0.5), entry=(0, 0.5))
     p.edge(ge, t30, exit=(1, 0.5), entry=(0, 0.5))
     p.edge(t30, tm, exit=(1, 0.5), entry=(0, 0.5))
-    lx, ly = p.at("agente", 1785, 130)
-    gx, _ = p.at("agente", 1495, 0)
-    p.edge(tm, ge, "volta a aguardar", exit=(0.5, 0), entry=(0.5, 0), pts=[(lx, ly), (gx, ly)])
+    p.edge(tm, hw, exit=(0.5, 1), entry=(0.5, 0))
+    p.edge(hw, h3, "Humano assume", exit=(0.5, 1), entry=(1, 0.5))
     p.edge(ge, h3, "Humano assume", exit=(0.5, 1), entry=(0.5, 0))
-    p.edge(h3, e3, exit=(1, 0.5), entry=(0, 0.5))
+    p.edge(h3, e3, exit=(0.5, 1), entry=(0.5, 0))
     p.edge(hn, ga, exit=(1, 0.5), entry=(0, 0.5))
     p.edge(ga, ha, "Sim", exit=(1, 0.5), entry=(0, 0.5))
     p.edge(ga, en, "Não", exit=(0.5, 1), entry=(0.5, 0))
@@ -306,19 +316,19 @@ def pagina_horario():
 
     # Notas e pendências (fora da pool, à direita/abaixo)
     oy = 90 + 170 + 430 + 140 + 330 + 30
-    p.vertex("<b>⚠ Em aberto (horário comercial)</b><br>"
-             "1. Quais são os critérios de qualificação? (região, orçamento, tipo de imóvel, prazo…)<br>"
-             "2. Enquanto o humano avalia um lead duvidoso, o que o agente diz ao lead? Ele espera ou segue conversando?<br>"
-             "3. Depois da 2ª notificação sem resposta do humano: repetir a cada 30 min? Escalar para gestor? Existe limite?<br>"
-             "4. Quem recebe as notificações (Lucas, Daniel, grupo) e por qual canal (WhatsApp, e-mail, CRM)?<br>"
-             "5. Feriados contam como horário comercial?",
-             OPEN, 40, oy, 900, 130)
+    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 170)
     p.vertex("<b>Regras desta página</b><br>"
              "• Na 1ª mensagem o humano é notificado <i>em paralelo</i> ao início do atendimento pelo agente.<br>"
              "• \"Lead pede humano\" interrompe a qualificação e cai na opção 3 (ponto A).<br>"
+             "• Lead em dúvida: o humano avalia enquanto o agente segue a conversa.<br>"
+             "• Opção 3: depois da 2ª notificação o agente não insiste mais; aguarda o humano.<br>"
+             "• Feriados não são horário comercial (seguem a pág. 3).<br>"
              "• Inatividade: ver pág. 4 (15 min ×2, 23h, 24h → perdido).<br>"
              "• Do agendamento em diante, a responsabilidade é do <b>Processo Comercial</b>.",
-             NOTE, 970, oy, 620, 130)
+             NOTE, 530, oy, 640, 170)
+    p.vertex("<b>⚠ Em aberto (horário comercial)</b><br>"
+             "1. Quem recebe as notificações (Lucas, Daniel, um grupo) e por qual canal (WhatsApp, e-mail, CRM)?",
+             OPEN, 1190, oy, 420, 80)
     return p
 
 
@@ -326,12 +336,12 @@ def pagina_horario():
 def pagina_fora():
     p = Page("p3", "3. IA Genérico – Fora do horário", 2450, 1350)
     W = 2320
-    p.pool("Agente IA Genérico · Fora do horário comercial (noites, fins de semana e feriados?)", 40, 90, W, [
+    p.pool("Agente IA Genérico · Fora do horário comercial (noites, fins de semana e feriados)", 40, 90, W, [
         ("lead", "Lead", 170), ("agente", "Agente IA Genérico", 430),
         ("crm", "CRM / Funis", 140), ("humano", "Atendente humano", 360)])
 
     s = p.node("lead", "Lead envia a 1ª mensagem<br>(qualquer canal)", ev("standard", "message", "right"), 185, 60, 50, 50)
-    p.node("lead", "Fora do horário <b>não</b> há notificação ao humano na 1ª mensagem.", ANNOT, 470, 20, 300, 40)
+    p.node("lead", "Fora do horário (inclusive feriados) só o agente atende: <b>não</b> há notificação ao humano na 1ª mensagem.", ANNOT, 430, 20, 360, 50)
     p.node("lead", "O lead pode pedir um humano a qualquer momento. Ele é avisado do horário "
                    "(seg–sex, 9h–18h) e pode deixar o pedido na fila.", ANNOT, 830, 20, 380, 50)
 
@@ -346,7 +356,7 @@ def pagina_fora():
     es = p.node("agente", "Conversa segue<br>com o agente", ev("end", "general", "right"), 500, 360, 30, 30)
     lb = p.node("agente", "Vai para <b>B</b>", ev("throwing", "link", "above"), 600, 265, 40, 40)
     gq = p.node("agente", "Lead<br>qualificado?", gw("x", "above"), 700, 80, 50, 50)
-    ts = p.node("agente", "Sinalizar o lead para avaliação humana no próximo dia útil", task("agente", "send"), 650, 250, 150, 80)
+    ts = p.node("agente", "Sinalizar o lead para avaliação humana no próximo dia útil <i>(o agente segue a conversa)</i>", task("agente", "send"), 650, 245, 150, 90)
     to = p.node("agente", "Personalizar a proposta e oferecer as 3 opções", task("agente", "service"), 810, 65, 180, 80)
     go = p.node("agente", "Opção<br>escolhida", gw("x", "above"), 1060, 80, 50, 50)
     tv = p.node("agente", "1) Agendar visita ao showroom", task("agente", "service"), 1190, 10, 180, 60)
@@ -361,7 +371,7 @@ def pagina_fora():
     cf = p.node("crm", "Marcar lead como <b>\"Aguardando humano\"</b> (não vira perdido por inatividade)",
                 task("crm", "service"), 1440, 30, 220, 80)
 
-    hv = p.node("humano", "Avaliar o lead no próximo dia útil<br><i>(critérios a definir)</i>", task("humano", "user"),
+    hv = p.node("humano", "Avaliar o lead no próximo dia útil<br><i>(critérios: ver nota)</i>", task("humano", "user"),
                 650, 30, 150, 80)
     gd = p.node("humano", "Decisão", gw("x", "above"), 850, 45, 50, 50)
     ha = p.node("humano", "Assumir a conversa<br><i>(aplicar regra da janela, ponto B)</i>", task("humano", "user"),
@@ -414,20 +424,21 @@ def pagina_fora():
     p.edge(hat, eh2, exit=(1, 0.5), entry=(0, 0.5))
 
     oy = 90 + 170 + 430 + 140 + 360 + 30
+    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 170)
     p.vertex("<b>⚠ Em aberto (fora do horário)</b><br>"
-             "1. A regra de 15 min de inatividade vale de madrugada? (pág. 4 aplica a mesma regra nos dois cenários; confirmar)<br>"
-             "2. Se o lead não responder ao template de segunda-feira: tentar de novo? Quantas vezes? Quando vira perdido?<br>"
-             "3. Feriados entram como \"fora do horário\"? O agente precisa de um calendário de feriados.<br>"
-             "4. Quem trabalha a fila \"Aguardando humano\" às 9h? Em que ordem (chegada, score)?<br>"
-             "5. Templates: textos e categoria (utility × marketing) a aprovar na Meta antes de ir para produção.",
-             OPEN, 40, oy, 900, 130)
+             "1. No dia útil seguinte o humano envia o template (WhatsApp) ou a mensagem com a tag (Instagram/Facebook) "
+             "e o lead <b>não responde</b>: tenta de novo? Quantas vezes? Depois de quanto tempo o lead vai para Perdidos?<br>"
+             "2. Quem trabalha a fila \"Aguardando humano\" às 9h? Em que ordem (chegada, score)?<br>"
+             "3. Templates: textos e categoria (utilidade × marketing) a aprovar na Meta antes de ir para produção.<br>"
+             "<i>Implementação: o agente precisa de um calendário de feriados para saber que está fora do horário.</i>",
+             OPEN, 530, oy, 560, 170)
     p.vertex("<b>Por que o ponto B se divide por canal</b><br>"
              "• <b>WhatsApp</b>: a janela de atendimento de 24h abre e <i>reinicia só quando o lead escreve</i>. Fora dela, "
              "só é permitido enviar template aprovado.<br>"
              "• <b>Instagram/Facebook</b>: a tag HUMAN_AGENT permite que um <i>humano</i> responda até 7 dias depois. "
              "Não pode ser usada em mensagem automática e exige permissão aprovada no app da Meta.<br>"
              f"<i>{FONTE_META}</i>",
-             NOTE, 970, oy, 760, 140)
+             NOTE, 1110, oy, 760, 170)
     return p
 
 
@@ -444,7 +455,7 @@ def pagina_inatividade():
     mr = p.node("agente", "Lead<br>respondeu", ev("catching", "message", "below"), 340, 60, 40, 40)
     eb = p.node("agente", "Volta ao ponto da conversa<br>(zera os contadores)", ev("end", "general", "right"), 440, 60, 40, 40)
     t15 = p.node("agente", "15 min sem<br>resposta", ev("catching", "timer", "below"), 340, 160, 40, 40)
-    gc = p.node("agente", "Já enviou 2<br>reativações<br>de 15 min?", gw("x", "below"), 430, 155, 50, 50)
+    gc = p.node("agente", "Atingiu o limite de<br>reativações de 15 min?<br>(comercial: 2 · fora: 1)", gw("x", "below"), 450, 155, 50, 50)
     r15 = p.node("agente", "Enviar mensagem de reativação (15 min)", task("agente", "send"), 560, 145, 180, 70)
     t23 = p.node("agente", "23h desde a última<br>mensagem <b>do lead</b>", ev("catching", "timer", "below"), 340, 270, 40, 40)
     r23 = p.node("agente", "Enviar última reativação (ainda dentro da janela de 24h)", task("agente", "send"), 560, 255, 180, 70)
@@ -475,12 +486,13 @@ def pagina_inatividade():
            pts=[(xr, p.at("agente", 0, 180)[1]), (xr, top), (gmx, top)])
     p.edge(r23, gm, exit=(1, 0.5), entry=(0.5, 0),
            pts=[(xr, p.at("agente", 0, 290)[1]), (xr, top), (gmx, top)])
-    gcx = p.at("agente", 455, 0)[0]
+    gcx = p.at("agente", 475, 0)[0]
     p.edge(gc, gm, "Sim (só aguarda)", exit=(0.5, 0), entry=(0.5, 0),
            pts=[(gcx, p.at("agente", 0, 120)[1]), (xr, p.at("agente", 0, 120)[1]), (xr, top), (gmx, top)])
 
     p.vertex("<b>Regras</b><br>"
-             "• 15 min sem resposta → reativação, no máximo <b>2 vezes</b> por período de silêncio.<br>"
+             "• 15 min sem resposta → reativação. Limite por período de silêncio: <b>2</b> em horário comercial, "
+             "<b>1</b> fora do horário.<br>"
              "• 23h → última reativação. Os relógios de 23h/24h contam a partir da <b>última mensagem do lead</b>, "
              "não da última mensagem do agente: a janela de 24h da Meta só reinicia quando o usuário escreve. "
              "Uma reativação enviada pelo agente não estende o prazo.<br>"
@@ -488,7 +500,8 @@ def pagina_inatividade():
              f"<i>{FONTE_META}</i>",
              NOTE, 870, 110, 450, 230)
     p.vertex("<b>⚠ Em aberto</b><br>"
-             "1. As reativações de 15 min valem fora do horário (madrugada)?<br>"
+             "1. A reativação única vale para todo o período fora do horário (ex.: sábado às 14h) ou só para a madrugada? "
+             "Se for só madrugada, qual faixa (ex.: 22h–7h)?<br>"
              "2. Textos das mensagens de reativação.<br>"
              "3. No Instagram/Facebook a janela padrão também é de 24h: a regra vale igual em todos os canais?",
              OPEN, 870, 360, 450, 110)
