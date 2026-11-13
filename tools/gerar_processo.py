@@ -152,9 +152,7 @@ CRITERIOS = ("<b>Critérios de qualificação</b> (o agente identifica durante a
              "• Ambientes<br>"
              "• Soluções desejadas<br>"
              "• Prioridade: conforto, segurança, praticidade ou entretenimento<br>"
-             "• Estágio da obra e prazo<br>"
-             "• Faixa de investimento (quando apropriado)<br>"
-             "• Responsáveis pela decisão")
+             "• Estágio da obra e prazo")
 
 # ================================================================ PÁGINA 1
 def pagina_mapa():
@@ -212,16 +210,27 @@ def pagina_mapa():
                 gen_id = vid
 
     # saída do Agente Genérico para os dois cenários
-    g = p.vertex("Lead chegou em<br>horário comercial?<br>(seg–sex, 9h–18h)", gw("x", "below"), 1340, 205, 50, 50)
-    p.edge(gen_id, g, exit=(1, 0.5), entry=(0, 0.5))
+    tk = p.vertex("Conferir data, hora e se hoje é feriado", task("agente", "businessRule"), 1250, 193, 150, 80)
+    ds = p.vertex("Fonte de conhecimento:<br><b>Calendário de feriados</b>",
+                  "shape=datastore;whiteSpace=wrap;html=1;verticalLabelPosition=bottom;verticalAlign=top;"
+                  "align=center;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;", 1290, 320, 70, 60)
+    p.edge(ds, tk, style=ASSOC + "endArrow=open;endFill=0;", exit=(0.5, 0), entry=(0.5, 1))
+    g = p.vertex("Dia útil (não feriado)<br>e seg–sex, 9h–18h?", gw("x", "below"), 1440, 205, 50, 50)
+    p.edge(gen_id, tk, exit=(1, 0.5), entry=(0, 0.5))
+    p.edge(tk, g, exit=(1, 0.5), entry=(0, 0.5))
     a = p.vertex("Atendimento em horário comercial<br><i>(clique para abrir a pág. 2)</i>", task("agente", call=True),
-                 1470, 80, 200, 80, link=pagelink("p2"))
+                 1560, 80, 200, 80, link=pagelink("p2"))
     b = p.vertex("Atendimento fora do horário<br><i>(clique para abrir a pág. 3)</i>", task("agente", call=True),
-                 1470, 190, 200, 80, link=pagelink("p3"))
+                 1560, 190, 200, 80, link=pagelink("p3"))
     p.edge(g, a, "Sim", exit=(0.5, 0), entry=(0, 0.5))
     p.edge(g, b, "Não", exit=(1, 0.5), entry=(0, 0.5))
+    p.vertex("<b>Configuração do Agente IA Genérico</b><br>"
+             "• <b>Diretriz geral:</b> antes de iniciar qualquer atendimento, conferir se hoje é feriado. "
+             "Feriado = fora do horário: só o agente atende.<br>"
+             "• <b>Fonte de conhecimento específica:</b> calendário de feriados (nacionais, estaduais e municipais), "
+             "a manter atualizado.", NOTE, 1250, 440, 510, 100)
     p.vertex("Daqui em diante o documento detalha <b>apenas o Agente IA Genérico</b>. "
-             "Os demais atendentes só aparecem neste mapa.", NOTE, 1340, 370, 330, 70)
+             "Os demais atendentes só aparecem neste mapa.", NOTE, 1250, 560, 510, 50)
     return p
 
 
@@ -266,7 +275,7 @@ def pagina_horario():
 
     # CRM
     ep = p.node("crm", "Funil: Perdidos<br>por inatividade", ev("end", "terminate", "right"), 250, 50, 40, 40)
-    ed = p.node("crm", "Funil:<br>Desqualificados", ev("end", "terminate", "right"), 820, 50, 40, 40)
+    ed = p.node("crm", "Funil:<br>Desqualificados", ev("end", "terminate", "right"), 655, 50, 40, 40)
 
     # Humano
     hn = p.node("humano", "Recebe notificação: novo lead", task("humano", "receive"), 100, 180, 150, 70)
@@ -275,7 +284,8 @@ def pagina_horario():
     ha = p.node("humano", "Assumir a conversa (o agente pausa)", task("humano", "user"), 420, 180, 170, 70)
     eh = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 485, 275, 40, 40)
     hv = p.node("humano", "Avaliar o lead<br><i>(critérios: ver nota)</i>", task("humano", "user"), 450, 30, 150, 70)
-    gd = p.node("humano", "Decisão", gw("x", "above"), 650, 40, 50, 50)
+    gd = p.node("humano", "", gw("x", "left"), 650, 40, 50, 50)
+    eseg = p.node("humano", "Nada a fazer:<br>o agente já segue", ev("end", "general", "right"), 770, 50, 30, 30)
     h3 = p.node("humano", "Assumir o chat", task("humano", "user"), 1420, 40, 150, 70)
     e3 = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 1475, 160, 40, 40)
 
@@ -291,8 +301,9 @@ def pagina_horario():
     p.edge(gq, ts, "Não / em dúvida", exit=(0.5, 1), entry=(0.5, 0))
     p.edge(ts, hv, exit=(0.5, 1), entry=(0.5, 0))
     p.edge(hv, gd, exit=(1, 0.5), entry=(0, 0.5))
-    p.edge(gd, to, "Seguir com o agente", exit=(0.5, 0), entry=(0.361, 1))
-    p.edge(gd, ed, "Desqualificar", exit=(1, 0.5), entry=(0.5, 1))
+    p.edge(ts, to, "Agente segue para a<br>personalização", exit=(1, 0.5), entry=(0.7, 1))
+    p.edge(gd, eseg, "Seguir com<br>o agente", exit=(1, 0.5), entry=(0, 0.5))
+    p.edge(gd, ed, "Desqualificar", exit=(0.5, 0), entry=(0.5, 1))
     p.edge(gd, ha, "Assumir", exit=(0.5, 1), entry=(1, 0.5))
     p.edge(to, go, exit=(1, 0.5), entry=(0, 0.5))
     p.edge(go, tv, "1", exit=(0.5, 0), entry=(0, 0.5))
@@ -316,11 +327,11 @@ def pagina_horario():
 
     # Notas e pendências (fora da pool, à direita/abaixo)
     oy = 90 + 170 + 430 + 140 + 330 + 30
-    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 170)
+    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 140)
     p.vertex("<b>Regras desta página</b><br>"
              "• Na 1ª mensagem o humano é notificado <i>em paralelo</i> ao início do atendimento pelo agente.<br>"
              "• \"Lead pede humano\" interrompe a qualificação e cai na opção 3 (ponto A).<br>"
-             "• Lead em dúvida: o humano avalia enquanto o agente segue a conversa.<br>"
+             "• Lead em dúvida: o agente sinaliza o humano e segue para a personalização ao mesmo tempo. Se o humano decidir assumir ou desqualificar, interrompe o agente.<br>"
              "• Opção 3: depois da 2ª notificação o agente não insiste mais; aguarda o humano.<br>"
              "• Feriados não são horário comercial (seguem a pág. 3).<br>"
              "• Inatividade: ver pág. 4 (15 min ×2, 23h, 24h → perdido).<br>"
@@ -367,13 +378,14 @@ def pagina_fora():
     ec = p.node("agente", "Processo<br>Comercial", ev("end", "general", "right"), 1440, 52, 40, 40)
 
     ep = p.node("crm", "Funil: Perdidos<br>por inatividade", ev("end", "terminate", "right"), 130, 50, 40, 40)
-    ed = p.node("crm", "Funil:<br>Desqualificados", ev("end", "terminate", "right"), 1000, 50, 40, 40)
+    ed = p.node("crm", "Funil:<br>Desqualificados", ev("end", "terminate", "right"), 855, 50, 40, 40)
     cf = p.node("crm", "Marcar lead como <b>\"Aguardando humano\"</b> (não vira perdido por inatividade)",
                 task("crm", "service"), 1440, 30, 220, 80)
 
     hv = p.node("humano", "Avaliar o lead no próximo dia útil<br><i>(critérios: ver nota)</i>", task("humano", "user"),
                 650, 30, 150, 80)
-    gd = p.node("humano", "Decisão", gw("x", "above"), 850, 45, 50, 50)
+    gd = p.node("humano", "", gw("x", "left"), 850, 45, 50, 50)
+    eseg = p.node("humano", "Nada a fazer:<br>o agente já segue", ev("end", "general", "right"), 970, 55, 30, 30)
     ha = p.node("humano", "Assumir a conversa<br><i>(aplicar regra da janela, ponto B)</i>", task("humano", "user"),
                 800, 170, 150, 70)
     eh = p.node("humano", "Processo<br>Comercial", ev("end", "general", "right"), 855, 280, 40, 40)
@@ -385,7 +397,7 @@ def pagina_fora():
                 task("humano", "send"), 1760, 130, 180, 80)
     hg = p.node("humano", "Responder com a tag <b>HUMAN_AGENT</b> (permitido até 7 dias após a última mensagem do lead)",
                 task("humano", "send"), 1760, 240, 180, 90)
-    hat = p.node("humano", "Atendimento humano", task("humano", "user"), 2000, 140, 150, 70)
+    hat = p.node("humano", "Atendimento humano<br><i>(Processo Comercial)</i>", task("humano", "user"), 2000, 140, 150, 70)
     eh2 = p.node("humano", "Processo<br>Comercial", ev("end", "general"), 2195, 155, 40, 40)
 
     p.edge(s, tq, exit=(0.5, 1), entry=(0.5, 0))
@@ -400,8 +412,9 @@ def pagina_fora():
     p.edge(gq, ts, "Não / em dúvida", exit=(0.5, 1), entry=(0.5, 0))
     p.edge(ts, hv, exit=(0.5, 1), entry=(0.5, 0))
     p.edge(hv, gd, exit=(1, 0.5), entry=(0, 0.5))
-    p.edge(gd, to, "Seguir com o agente", exit=(0.5, 0), entry=(0.361, 1))
-    p.edge(gd, ed, "Desqualificar", exit=(1, 0.5), entry=(0.5, 1))
+    p.edge(ts, to, "Agente segue para a<br>personalização", exit=(1, 0.5), entry=(0.6, 1))
+    p.edge(gd, eseg, "Seguir com<br>o agente", exit=(1, 0.5), entry=(0, 0.5))
+    p.edge(gd, ed, "Desqualificar", exit=(0.5, 0), entry=(0.5, 1))
     p.edge(gd, ha, "Assumir", exit=(0.5, 1), entry=(0.5, 0))
     p.edge(ha, eh, exit=(0.5, 1), entry=(0.5, 0))
     p.edge(to, go, exit=(1, 0.5), entry=(0, 0.5))
@@ -424,13 +437,12 @@ def pagina_fora():
     p.edge(hat, eh2, exit=(1, 0.5), entry=(0, 0.5))
 
     oy = 90 + 170 + 430 + 140 + 360 + 30
-    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 170)
+    p.vertex(CRITERIOS, NOTE, 40, oy, 470, 140)
     p.vertex("<b>⚠ Em aberto (fora do horário)</b><br>"
-             "1. No dia útil seguinte o humano envia o template (WhatsApp) ou a mensagem com a tag (Instagram/Facebook) "
-             "e o lead <b>não responde</b>: tenta de novo? Quantas vezes? Depois de quanto tempo o lead vai para Perdidos?<br>"
-             "2. Quem trabalha a fila \"Aguardando humano\" às 9h? Em que ordem (chegada, score)?<br>"
-             "3. Templates: textos e categoria (utilidade × marketing) a aprovar na Meta antes de ir para produção.<br>"
-             "<i>Implementação: o agente precisa de um calendário de feriados para saber que está fora do horário.</i>",
+             "1. Quem trabalha a fila \"Aguardando humano\" às 9h? Em que ordem (chegada, score)?<br>"
+             "2. Templates: textos e categoria (utilidade × marketing) a aprovar na Meta antes de ir para produção.<br><br>"
+             "<i>Definido: se o lead não responder ao template ou à mensagem com a tag, quem decide o que fazer "
+             "é o comercial (Processo Comercial, fora deste documento). Feriados: ver configuração do agente na pág. 1.</i>",
              OPEN, 530, oy, 560, 170)
     p.vertex("<b>Por que o ponto B se divide por canal</b><br>"
              "• <b>WhatsApp</b>: a janela de atendimento de 24h abre e <i>reinicia só quando o lead escreve</i>. Fora dela, "
